@@ -1,4 +1,8 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Redirect } from "react-router-dom";
+import { SignUp } from "../../redux/Action/AuthAction";
+
 import { withStyles } from "@material-ui/core/styles";
 import { register } from "./RegistrationStyles";
 import InputAdornment from "@material-ui/core/InputAdornment";
@@ -16,8 +20,10 @@ import VisibilityTwoToneIcon from "@material-ui/icons/VisibilityTwoTone";
 import VisibilityOffTwoToneIcon from "@material-ui/icons/VisibilityOffTwoTone";
 import CloseIcon from "@material-ui/icons/Close";
 
-class Registration extends Component {
-  state = {
+
+const Registration = ({ classes }) => {
+  const auth = useSelector((state) => state.auth);  
+ const [ state,setState] =  useState({
     name: "",
 
     email: "",
@@ -26,53 +32,55 @@ class Registration extends Component {
     hidePassword: true,
     error: null,
     errorOpen: false,
-  };
+  });
 
-  errorClose = (e) => {
-    this.setState({
+
+ const  errorClose = (e) => {
+    setState({
       errorOpen: false,
     });
   };
 
-  handleChange = (name) => (e) => {
-    this.setState({
-      [name]: e.target.value,
-    });
+  const handleChange = (e) => {
+    let { name, value } = e.target;
+        setState({ ...state, [name]: value })
   };
 
-  passwordMatch = () => this.state.password === this.state.passwordConfrim;
+  const passwordMatch = () => state.password === state.passwordConfrim;
 
-  showPassword = () => {
-    this.setState((prevState) => ({ hidePassword: !prevState.hidePassword }));
+ const  showPassword = () => {
+    setState((prevState) => ({ hidePassword: !prevState.hidePassword }));
   };
-
-  isValid = () => {
-    if (this.state.email === "") {
+  const  isValid = () => {
+    if (state.email === "") {
       return false;
     }
     return true;
-  };
-  submitRegistration = (e) => {
+  }; 
+  
+  const dispatch = useDispatch()
+  const submitRegistration = (e) => {
     e.preventDefault();
-    if (!this.passwordMatch()) {
-      this.setState({
+    if (!passwordMatch()) {
+      setState({
         errorOpen: true,
         error: "Passwords don't match",
       });
     }
     const newUserCredentials = {
-     name:this.state.name,
-        email: this.state.email,
+     name:state.name,
+        email: state.email,
 
-      password: this.state.password,
-      passwordConfrim: this.state.passwordConfrim,
+      password: state.password,
+      passwordConfrim: state.passwordConfrim,
     };
-    console.log("this.props.newUserCredentials", newUserCredentials);
-    //dispath to userActions
+    // dispath to userActions
+    dispatch(SignUp(newUserCredentials));
+    console.log("props.newUserCredentials", newUserCredentials);
   };
 
-  render() {
-    const { classes } = this.props;
+  
+ 
     return (
       <div className={classes.main}>
         <CssBaseline />
@@ -83,7 +91,7 @@ class Registration extends Component {
           </Avatar>
           <form
             className={classes.form}
-            onSubmit={() => this.submitRegistration}
+            onSubmit={() => submitRegistration}
           >
             <FormControl required fullWidth margin="normal">
               <InputLabel htmlFor="name" className={classes.labels}>
@@ -95,7 +103,7 @@ class Registration extends Component {
                 autoComplete="name"
                 className={classes.inputs}
                 disableUnderline={true}
-                onChange={this.handleChange("name")}
+                onChange={handleChange}
               />
             </FormControl>
             <FormControl required fullWidth margin="normal">
@@ -108,7 +116,7 @@ class Registration extends Component {
                 autoComplete="email"
                 className={classes.inputs}
                 disableUnderline={true}
-                onChange={this.handleChange("email")}
+                onChange={handleChange}
               />
             </FormControl>
 
@@ -121,15 +129,15 @@ class Registration extends Component {
                 autoComplete="password"
                 className={classes.inputs}
                 disableUnderline={true}
-                onChange={this.handleChange("password")}
-                type={this.state.hidePassword ? "password" : "input"}
+                onChange={handleChange}
+                type={state.hidePassword ? "password" : "input"}
                 endAdornment={
-                  this.state.hidePassword ? (
+                  state.hidePassword ? (
                     <InputAdornment position="end">
                       <VisibilityOffTwoToneIcon
                         fontSize="default"
                         className={classes.passwordEye}
-                        onClick={this.showPassword}
+                        onClick={showPassword}
                       />
                     </InputAdornment>
                   ) : (
@@ -137,7 +145,7 @@ class Registration extends Component {
                       <VisibilityTwoToneIcon
                         fontSize="default"
                         className={classes.passwordEye}
-                        onClick={this.showPassword}
+                        onClick={showPassword}
                       />
                     </InputAdornment>
                   )
@@ -154,16 +162,16 @@ class Registration extends Component {
                 autoComplete="passwordConfrim"
                 className={classes.inputs}
                 disableUnderline={true}
-                onClick={this.state.showPassword}
-                onChange={this.handleChange("passwordConfrim")}
-                type={this.state.hidePassword ? "password" : "input"}
+                onClick={state.showPassword}
+                onChange={handleChange}
+                type={state.hidePassword ? "password" : "input"}
                 endAdornment={
-                  this.state.hidePassword ? (
+                  state.hidePassword ? (
                     <InputAdornment position="end">
                       <VisibilityOffTwoToneIcon
                         fontSize="default"
                         className={classes.passwordEye}
-                        onClick={this.showPassword}
+                        onClick={showPassword}
                       />
                     </InputAdornment>
                   ) : (
@@ -171,7 +179,7 @@ class Registration extends Component {
                       <VisibilityTwoToneIcon
                         fontSize="default"
                         className={classes.passwordEye}
-                        onClick={this.showPassword}
+                        onClick={showPassword}
                       />
                     </InputAdornment>
                   )
@@ -179,28 +187,28 @@ class Registration extends Component {
               />
             </FormControl>
             <Button
-              disabled={!this.isValid()}
+              disabled={!isValid()}
               disableRipple
               fullWidth
               variant="outlined"
               className={classes.button}
               type="submit"
-              onClick={this.submitRegistration}
+              onClick={submitRegistration}
             >
               Join
             </Button>
           </form>
 
-          {this.state.error ? (
+          {state.error ? (
             <Snackbar
               variant="error"
-              key={this.state.error}
+              key={state.error}
               anchorOrigin={{
                 vertical: "bottom",
                 horizontal: "center",
               }}
-              open={this.state.errorOpen}
-              onClose={this.errorClose}
+              open={state.errorOpen}
+              onClose={errorClose}
               autoHideDuration={3000}
             >
               <SnackbarContent
@@ -210,14 +218,14 @@ class Registration extends Component {
                     <span style={{ marginRight: "8px" }}>
                       <ErrorIcon fontSize="large" color="error" />
                     </span>
-                    <span> {this.state.error} </span>
+                    <span> {state.error} </span>
                   </div>
                 }
                 action={[
                   <IconButton
                     key="close"
                     aria-label="close"
-                    onClick={this.errorClose}
+                    onClick={errorClose}
                   >
                     <CloseIcon color="error" />
                   </IconButton>,
@@ -229,6 +237,6 @@ class Registration extends Component {
       </div>
     );
   }
-}
+
 
 export default withStyles(register)(Registration);
