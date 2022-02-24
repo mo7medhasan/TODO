@@ -4,7 +4,7 @@ const validator = require("validator");
 const jwt = require("jsonwebtoken");
 
 //SIGN UP
-exports.signUp = async (req, res, next) => {
+exports.signUp = async (req, res) => {
   try {
     const [name, email, password] = await req.body;
     const validEmail = validator.isEmail(email);
@@ -84,14 +84,14 @@ exports.login = async (req, res) => {
             email: user.email,
           },
           process.env.JWT_SEC,
-          { expiresIn: "3d" }
+          { expiresIn: "1d" }
         );
         jwt.verify(userToken, process.env.JWT_SEC, (err, userData) => {
           if (userData) {
             console.log(userData);
             res
               .status(200)
-              .send({ success: true, token: userToken, user: user });
+              .json({ success: true, token: userToken, data: user });
           }
         });
       } else {
