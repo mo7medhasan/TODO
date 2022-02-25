@@ -1,5 +1,5 @@
 import axios from "axios";
-import { url } from "../../Network/api";
+import { url } from "../../api";
 import { toast } from "react-toastify";
 
 export const signUp = (user) => {

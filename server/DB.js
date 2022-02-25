@@ -5,7 +5,12 @@ dotenv.config();
 
 try {
    mongoose
-    .connect(process.env.MONGO_URL)
+    .connect(process.env.MONGO_URL, {
+      useNewUrlParser: true,
+      useCreateIndex: true,
+      useUnifiedTopology: true,
+      useFindAndModify: false,
+    })
     .then(() => {
       console.log(`Success connect to Database 👏🤩😎`);
     })
